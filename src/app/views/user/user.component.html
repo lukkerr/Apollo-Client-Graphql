@@ -1,0 +1,92 @@
+<mat-spinner *ngIf="!loaded"></mat-spinner>
+<div *ngIf="loaded" class="div-user">
+  <div *ngIf="flagShowPopup" #popUpBox class="popup" (click)="clickPoUp($event,popUpBox)">
+    <mat-card class="card-user">
+      <mat-card-title>{{popUpMode === 'add' ? "Adicionar": "Editar"}} Usuário</mat-card-title>
+      <form action="">
+
+        <mat-form-field>
+          <input matInput placeholder="Nome" [(ngModel)]="user.name" name="nome" autocomplete="off">
+        </mat-form-field>
+
+        <mat-form-field>
+          <input matInput placeholder="Email" [(ngModel)]="user.email" name="email" autocomplete="off">
+        </mat-form-field>
+
+        <mat-form-field>
+          <input matInput type="password" placeholder="Senha" [(ngModel)]="user.password" name="password" autocomplete="off">
+        </mat-form-field>
+
+      </form>
+      <button mat-raised-button #buttonSalvar (click)="saveUser(buttonSalvar, buttonCancelar)"  color="primary" >Salvar</button>
+      <button mat-raised-button #buttonCancelar (click)="showPopUp(null, eraseUserValues)" >Cancelar</button>
+
+      <button *ngIf="popUpMode == 'edit'" (click)="openConfirm()" class="delete-icon" mat-fab color="primary">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </mat-card>
+  </div>
+
+  <header>
+
+    <div class="row-add">
+      <h3>Usuários</h3>
+
+      <button (click)="showPopUp('add', eraseUserValues)" mat-fab color="primary" aria-label="Adicionar novo usuário">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+
+    <div class="filter-box">
+      <mat-form-field class="input-pesquisar" appearance="fill">
+        <mat-label>Pesquisar por usuário:</mat-label>
+        <input #inputSearch (input)="search(inputSearch)" matInput placeholder="Digite o usuário desejado">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Selecione o Filtro</mat-label>
+        <mat-select [(ngModel)]="filterField" (selectionChange)="search(inputSearch)">
+          <mat-option [value]="''">-</mat-option>
+          <mat-option *ngFor="let item of [].constructor(displayedColumns.length); let i = index"  [value]="displayedColumns[i]">{{filterFields[i]}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+  </header>
+
+  <div class="content">
+    <mat-table #table [dataSource]="filterUsers">
+
+      <ng-container matColumnDef="id">
+        <mat-header-cell *matHeaderCellDef>Id</mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.id}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef>Nome</mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <mat-header-cell *matHeaderCellDef>E-mail</mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.email}} </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="showPopUp('edit', row)"></mat-row>
+
+    </mat-table>
+
+    <p *ngIf="filterUsers.length === 0">Nenhum usuário encontrado.</p>
+  </div>
+</div>
+
+<div class="popup" *ngIf="flagShowConfirm" #confirmBox (click)="clickConfirm($event,confirmBox)">
+  <div class="confirm">
+    <p>Deseja realmente excluir o usuário?</p>
+    <div>
+      <button mat-raised-button color="accent" (click)="eraseUser()">Sim</button>
+      <button mat-raised-button (click)="closeConfirm()">Não</button>
+    </div>
+  </div>
+</div>
